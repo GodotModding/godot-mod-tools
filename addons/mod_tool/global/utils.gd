@@ -13,7 +13,7 @@ static func reload_script(script: Script, mod_tool_store: ModToolStore) -> void:
 	if script.resource_path in pending_reloads:
 		var source_code_from_disc := FileAccess.open(script.resource_path, FileAccess.READ).get_as_text()
 
-		var script_editor := EditorInterface.get_script_editor()
+		var script_editor := mod_tool_store.editor_interface.get_script_editor()
 		var text_edit: CodeEdit = script_editor.get_current_editor().get_base_editor()
 
 		var column := text_edit.get_caret_column()
@@ -129,8 +129,8 @@ static func check_for_hooked_script(script_paths: Array[String], mod_tool_store:
 	return count
 
 
-static func quote_string(string: String) -> String:
-	var settings: EditorSettings = EditorInterface.get_editor_settings()
+static func quote_string(string: String, mod_tool_store: ModToolStore) -> String:
+	var settings: EditorSettings = mod_tool_store.editor_interface.get_editor_settings()
 	if settings.get_setting("text_editor/completion/use_single_quotes"):
 		return "'%s'" % string
 	return "\"%s\"" % string

@@ -45,7 +45,7 @@ func _on_close_requested() -> void:
 
 func _on_button_restart_now_pressed() -> void:
 	await get_tree().create_timer(1.0).timeout
-	EditorInterface.restart_editor()
+	mod_tool_store.editor_interface.restart_editor()
 
 
 func _on_button_restart_later_pressed() -> void:

@@ -10,6 +10,7 @@ const PATH_SAVE_FILE := "user://mod-tool-plugin-save.json"
 const PATH_TEMPLATES_DIR := "res://addons/mod_tool/templates/"
 
 var editor_plugin: EditorPlugin
+var editor_interface: EditorInterface
 var editor_file_system: EditorFileSystem
 var editor_base_control: Control
 

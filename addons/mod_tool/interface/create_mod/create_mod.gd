@@ -50,15 +50,15 @@ func add_mod() -> void:
 		await mod_tool_store.editor_file_system.filesystem_changed
 
 		# Navigate to the new mod dir in the FileSystem pannel
-		EditorInterface.get_file_system_dock().navigate_to_path(mod_tool_store.path_mod_dir.path_join("mod_main.gd"))
+		mod_tool_store.editor_interface.get_file_system_dock().navigate_to_path(mod_tool_store.path_mod_dir.path_join("mod_main.gd"))
 
 		# Output info
 		ModToolUtils.output_info("Added base mod files to " + mod_tool_store.path_mod_dir)
 
 		# Open mod_main.gd in the code editor
 		var mod_main_script := load(mod_tool_store.path_mod_dir.path_join("mod_main.gd"))
-		EditorInterface.edit_script(mod_main_script)
-		EditorInterface.set_main_screen_editor("Script")
+		mod_tool_store.editor_interface.edit_script(mod_main_script)
+		mod_tool_store.editor_interface.set_main_screen_editor("Script")
 
 		# Split the new mod id
 		var name_mod_dir_split: Array = mod_tool_store.name_mod_dir.split("-")

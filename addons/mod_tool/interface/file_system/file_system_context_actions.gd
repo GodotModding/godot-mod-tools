@@ -109,11 +109,11 @@ func create_script_extension(file_path: String) -> String:
 		ModToolUtils.output_info('Created script extension of "%s" at path %s' % [file_path.get_file(), extension_path])
 
 	mod_tool_store.editor_file_system.scan()
-	EditorInterface.get_file_system_dock().navigate_to_path(extension_path)
+	mod_tool_store.editor_interface.get_file_system_dock().navigate_to_path(extension_path)
 	# Load the new extension script
 	var extension_script: Script = load(extension_path)
 	# Open the new extension script in the script editor
-	EditorInterface.edit_script(extension_script)
+	mod_tool_store.editor_interface.edit_script(extension_script)
 
 	return extension_path
 
@@ -137,11 +137,11 @@ func create_mod_hook_file(file_path: String) -> String:
 		ModToolUtils.output_info('Created mod hook file for "%s" at path %s' % [file_path.get_file(), extension_path])
 
 	mod_tool_store.editor_file_system.scan()
-	EditorInterface.get_file_system_dock().navigate_to_path(extension_path)
+	mod_tool_store.editor_interface.get_file_system_dock().navigate_to_path(extension_path)
 	# Load the new extension script
 	var extension_script: Script = load(extension_path)
 	# Open the new extension script in the script editor
-	EditorInterface.edit_script(extension_script)
+	mod_tool_store.editor_interface.edit_script(extension_script)
 
 	return extension_path
 
@@ -165,10 +165,10 @@ func add_script_extension_to_mod_main(extension_path: String) -> void:
 	# variable "extensions_dir_path" is found, use that variable in combination with path_join
 	var extension_install_line := "\tModLoaderMod.install_script_extension(%s)\n"
 	if mod_extensions_dir_path_index == -1:
-		extension_install_line = extension_install_line % ModToolUtils.quote_string(extension_path)
+		extension_install_line = extension_install_line % ModToolUtils.quote_string(extension_path, mod_tool_store)
 	else:
 		extension_path = extension_path.trim_prefix(mod_tool_store.path_mod_dir.path_join("extensions/"))
-		extension_install_line = extension_install_line % "extensions_dir_path.path_join(%s)" % ModToolUtils.quote_string(extension_path)
+		extension_install_line = extension_install_line % "extensions_dir_path.path_join(%s)" % ModToolUtils.quote_string(extension_path, mod_tool_store)
 
 	# Check if that file was already used as script extension
 	if extension_install_line.strip_edges() in file_content:
@@ -207,12 +207,12 @@ func add_hook_file_to_mod_main(vanilla_path: String, extension_path: String) -> 
 
 	# Construct the line required to install the extension. If the standard way is used and a
 	# variable "extensions_dir_path" is found, use that variable in combination with path_join
-	var extension_install_line := "\tModLoaderMod.install_script_hooks(" + ModToolUtils.quote_string(vanilla_path) + ", %s)\n"
+	var extension_install_line := "\tModLoaderMod.install_script_hooks(" + ModToolUtils.quote_string(vanilla_path, mod_tool_store) + ", %s)\n"
 	if mod_extensions_dir_path_index == -1:
-		extension_install_line = extension_install_line % ModToolUtils.quote_string(extension_path)
+		extension_install_line = extension_install_line % ModToolUtils.quote_string(extension_path, mod_tool_store)
 	else:
 		extension_path = extension_path.trim_prefix(mod_tool_store.path_mod_dir.path_join("extensions/"))
-		extension_install_line = extension_install_line % "extensions_dir_path.path_join(%s)" % ModToolUtils.quote_string(extension_path)
+		extension_install_line = extension_install_line % "extensions_dir_path.path_join(%s)" % ModToolUtils.quote_string(extension_path, mod_tool_store)
 
 	# Check if that file was already used as script extension
 	if extension_install_line.strip_edges() in file_content:
@@ -248,8 +248,8 @@ func create_overwrite_asset(file_path: String) -> String:
 		DirAccess.copy_absolute(file_path, overwrite_path)
 		ModToolUtils.output_info('Copied asset "%s" as overwrite to path %s' % [file_path.get_file(), overwrite_path])
 
-	EditorInterface.get_resource_filesystem().scan()
-	EditorInterface.get_file_system_dock().navigate_to_path(overwrite_path)
+	mod_tool_store.editor_interface.get_resource_filesystem().scan()
+	mod_tool_store.editor_interface.get_file_system_dock().navigate_to_path(overwrite_path)
 
 	return overwrite_path
 
@@ -322,7 +322,7 @@ func _init():
 	overwrites_script_new.free()
 
 	# Open the overwrites script in the script editor
-	EditorInterface.edit_script(overwrites_script)
+	mod_tool_store.editor_interface.edit_script(overwrites_script)
 
 	ModToolUtils.output_info('Added asset overwrite "%s" to mod "%s"' % [asset_path, overwrites_script_path.get_base_dir().get_file()])
 
@@ -432,8 +432,8 @@ func handle_script_extension_creation(metadata: Dictionary) -> void:
 	# unintentionally overwrite the original script content.
 	mod_tool_store.pending_reloads.push_back(mod_main_path)
 
-	 #Switch to the script screen
-	EditorInterface.set_main_screen_editor("Script")
+	#Switch to the script screen
+	mod_tool_store.editor_interface.set_main_screen_editor("Script")
 
 
 func handle_mod_hook_file_creation(metadata: Dictionary) -> void:
@@ -452,8 +452,8 @@ func handle_mod_hook_file_creation(metadata: Dictionary) -> void:
 	# unintentionally overwrite the original script content.
 	mod_tool_store.pending_reloads.push_back(mod_main_path)
 
-	 #Switch to the script screen
-	EditorInterface.set_main_screen_editor("Script")
+	#Switch to the script screen
+	mod_tool_store.editor_interface.set_main_screen_editor("Script")
 
 
 func handle_override_creation(metadata: Dictionary) -> void:
@@ -466,7 +466,7 @@ func handle_override_creation(metadata: Dictionary) -> void:
 		if asset_path:
 			add_asset_overwrite_to_overwrites(file_path, asset_path)
 
-	current_script = EditorInterface.get_script_editor().get_current_script()
+	current_script = mod_tool_store.editor_interface.get_script_editor().get_current_script()
 
 	mod_tool_store.pending_reloads.push_back(overwrites_path)
 
@@ -474,7 +474,7 @@ func handle_override_creation(metadata: Dictionary) -> void:
 		ModToolUtils.reload_script(current_script, mod_tool_store)
 
 	#Switch to the script screen
-	EditorInterface.set_main_screen_editor("Script")
+	mod_tool_store.editor_interface.set_main_screen_editor("Script")
 
 
 func handle_mod_hook_creation(metadata: Dictionary) -> void:
@@ -489,7 +489,7 @@ func handle_mod_hook_creation(metadata: Dictionary) -> void:
 			return
 
 		mod_tool_store.pending_reloads.push_back(file_path)
-		current_script = EditorInterface.get_script_editor().get_current_script()
+		current_script = mod_tool_store.editor_interface.get_script_editor().get_current_script()
 
 		if current_script.resource_path == file_path:
 			ModToolUtils.reload_script(current_script, mod_tool_store)
@@ -509,7 +509,7 @@ func handle_mod_hook_restore(metadata: Dictionary) -> void:
 			return
 
 		mod_tool_store.pending_reloads.push_back(file_path)
-		current_script = EditorInterface.get_script_editor().get_current_script()
+		current_script = mod_tool_store.editor_interface.get_script_editor().get_current_script()
 
 		if current_script.resource_path == file_path:
 			ModToolUtils.reload_script(current_script, mod_tool_store)
